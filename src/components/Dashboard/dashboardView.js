@@ -1,23 +1,16 @@
 import react, { useState } from 'react';
 import { CSVLink } from 'react-csv';
+import { Link } from 'react-router-dom';
 
-function DashboardView() {
+function DashboardView(props) {
+
+    let userEmail = localStorage.getItem('email');
 
     const header = [
         { label: 'First Name', key: 'name' },
         { label: 'Price', key: 'price' },
         { label: 'Status', key: 'status' }
     ]
-
-    const [initialData, setInitialData] = useState([
-        { id: '1', name: 'item 1', price: 20, status: 'Available' },
-        { id: '2', name: 'sdd 9', price: 10, status: 'Available' },
-        { id: '3', name: 'Item 3', price: 50, status: 'Available' },
-        { id: '4', name: 'Item 4', price: 90, status: 'Available' },
-        { id: '5', name: 'Item 5', price: 80, status: 'Available' },
-    ]);
-
-    const [itemList, setItemList] = useState(initialData);
 
     const [itemName, setItemName] = useState();
     const [itemPrice, setItemPrice] = useState();
@@ -29,17 +22,17 @@ function DashboardView() {
 
 
     function handleDelete(i) {
-        setItemList(initialData.filter((item) => item.id !== i));
-        setInitialData(initialData.filter((item) => item.id !== i));
+        props.setItemList({ ...props.initialData, [userEmail]: props.initialData[userEmail].filter((item) => item.id !== i) });
+        props.setInitialData({ ...props.initialData, [userEmail]: props.initialData[userEmail].filter((item) => item.id !== i) });
         setSearchData('');
     }
 
     function handleSearch(value) {
         setSearchData(value);
         if (value !== '') {
-            setItemList(initialData.filter((item) => item.name.toLowerCase().includes(value)));
+            props.setItemList({ ...props.initialData, [userEmail]: props.initialData[userEmail].filter((item) => item.name.toLowerCase().includes(value)) });
         } else {
-            setItemList(initialData);
+            props.setItemList({ ...props.initialData, [userEmail]: props.initialData[userEmail] });
         }
     }
 
@@ -51,8 +44,8 @@ function DashboardView() {
             status: itemStatus,
             id: Math.random()
         }
-        setItemList([...initialData, dataObj]);
-        setInitialData([...initialData, dataObj]);
+        props.setItemList({ ...props.initialData, [userEmail]: [...props.initialData[userEmail], dataObj] });
+        props.setInitialData({ ...props.initialData, [userEmail]: [...props.initialData[userEmail], dataObj] });
 
         setItemName('');
         setItemPrice('');
@@ -60,12 +53,12 @@ function DashboardView() {
     }
 
     function handleShortName() {
-        setItemList([...initialData.sort((a, b) => (nameShortFlag ? a.name.toLowerCase() > b.name.toLowerCase() : a.name.toLowerCase() < b.name.toLowerCase()) ? 1 : -1)]);
+        props.setItemList([...props.initialData[userEmail].sort((a, b) => (nameShortFlag ? a.name.toLowerCase() > b.name.toLowerCase() : a.name.toLowerCase() < b.name.toLowerCase()) ? 1 : -1)]);
         setNameShortFlag(!nameShortFlag);
     }
 
     function handleShortPrice() {
-        setItemList([...initialData.sort((a, b) => (priceShortFlag ? a.price > b.price : a.price < b.price) ? 1 : -1)]);
+        props.setItemList([...props.initialData[userEmail].sort((a, b) => (priceShortFlag ? a.price > b.price : a.price < b.price) ? 1 : -1)]);
         setPriceShortFlag(!priceShortFlag);
     }
 
@@ -130,12 +123,13 @@ function DashboardView() {
                     <div className="mt-4 ml-4">
                         <button
                             type="submit"
-                            className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+                            className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
                         >
                             Add Item
                         </button>
                     </div>
-                </form>
+
+                </form>               
                 <div className="flex">
                     <div className="mt-4 mr-4">
                         <div className="relative border border-gray-300 rounded  shadow-sm ">
@@ -157,10 +151,10 @@ function DashboardView() {
                         </div>
                     </div>
                     <div className="mt-4">
-                        <CSVLink filename={'Portal.csv'} data={itemList} headers={header}>
+                        <CSVLink filename={'Portal.csv'} data={props.itemList && props.itemList[userEmail]} headers={header}>
                             <button
                                 type="button"
-                                className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+                                className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
                             >
                                 Download CSV
                             </button>
@@ -193,7 +187,7 @@ function DashboardView() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                    {itemList.map((item, index) => (
+                                    {props.itemList[userEmail].map((item, index) => (
                                         <tr key={item.email}>
                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{index + 1}</td>
                                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm  text-gray-900 sm:pl-6">

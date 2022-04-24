@@ -2,11 +2,11 @@ import react from 'react';
 import Header from '../Header/header';
 import DashboardView from './dashboardView';
 
-function Dashboard() {
+function Dashboard(props) {
     return (
         <div>
             <Header />
-            <DashboardView />
+            <DashboardView {...props} />
         </div>
     );
 }
